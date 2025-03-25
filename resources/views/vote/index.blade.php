@@ -62,6 +62,12 @@
                                 <button type="submit" class="btn btn-primary">Votar</button>
                             </div>
                         </form>
+
+                        <hr class="my-4">
+
+                        <div class="d-grid">
+                            <a href="{{ route('login') }}" class="btn btn-secondary">Gestionar</a>
+                        </div>
                     </div>
                 </div>
             </div>
