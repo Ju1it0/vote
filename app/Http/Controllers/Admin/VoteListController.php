@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Vote;
 use App\Models\Voter;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,7 @@ class VoteListController extends Controller
             ->orderByDesc('date')
             ->paginate(10);
 
-        return view('votes.index', compact('topCandidate', 'votes'));
+        return view('admin.votes.index', compact('topCandidate', 'votes'));
     }
 
     public function show(Vote $vote)

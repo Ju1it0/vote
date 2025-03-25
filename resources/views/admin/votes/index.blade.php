@@ -57,12 +57,12 @@
                     <h5 class="mb-3">Menú</h5>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('dashboard') }}">
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}">
                                 <i class="bi bi-graph-up"></i> Candidatos más votados
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('votes.index') }}">
+                            <a class="nav-link active" href="{{ route('admin.votes.index') }}">
                                 <i class="bi bi-list-check"></i> Listado de Votos
                             </a>
                         </li>
@@ -163,8 +163,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function loadVoteDetails(voteId) {
-            fetch(`/votes/${voteId}`)
-                .then(response => response.json())
+            fetch(`/admin/votes/${voteId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(vote => {
                     const details = `
                         <div class="row">
@@ -192,7 +197,12 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    document.getElementById('voteDetails').innerHTML = '<div class="alert alert-danger">Error al cargar los detalles del voto</div>';
+                    document.getElementById('voteDetails').innerHTML = `
+                        <div class="alert alert-danger">
+                            <h6 class="alert-heading">Error al cargar los detalles</h6>
+                            <p class="mb-0">No se pudo cargar la información del voto. Por favor, intente nuevamente.</p>
+                        </div>
+                    `;
                 });
         }
     </script>

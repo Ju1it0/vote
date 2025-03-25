@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Voter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,6 @@ class DashboardController extends Controller
             ->orderByDesc('vote_count')
             ->paginate(10);
 
-        return view('dashboard', compact('topCandidates'));
+        return view('admin.dashboard.index', compact('topCandidates'));
     }
 } 

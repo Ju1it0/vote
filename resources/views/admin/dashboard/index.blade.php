@@ -51,12 +51,12 @@
                     <h5 class="mb-3">Menú</h5>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('dashboard') }}">
+                            <a class="nav-link active" href="{{ route('admin.dashboard') }}">
                                 <i class="bi bi-graph-up"></i> Candidatos más votados
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('votes.index') }}">
+                            <a class="nav-link" href="{{ route('admin.votes.index') }}">
                                 <i class="bi bi-list-check"></i> Listado de Votos
                             </a>
                         </li>
