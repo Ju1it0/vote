@@ -60,6 +60,11 @@
                                 <i class="bi bi-list-check"></i> Listado de Votos
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.password') }}">
+                                <i class="bi bi-key"></i> Cambiar Contraseña
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

@@ -34,4 +34,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/votes', [VoteListController::class, 'index'])->name('votes.index');
     Route::get('/votes/{vote}', [VoteListController::class, 'show'])->name('votes.show');
+    
+    // Rutas para cambio de contraseña del administrador
+    Route::get('/admin/password', [App\Http\Controllers\Admin\PasswordController::class, 'showChangeForm'])->name('admin.password');
+    Route::post('/admin/password', [App\Http\Controllers\Admin\PasswordController::class, 'update'])->name('admin.password.update');
 });
