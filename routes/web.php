@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VoteController;
+use App\Http\Controllers\VoteListController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,4 +32,6 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // Rutas protegidas del backoffice
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/votes', [VoteListController::class, 'index'])->name('votes.index');
+    Route::get('/votes/{vote}', [VoteListController::class, 'show'])->name('votes.show');
 });

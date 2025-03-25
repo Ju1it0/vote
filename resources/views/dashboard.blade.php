@@ -55,7 +55,11 @@
                                 <i class="bi bi-graph-up"></i> Candidatos más votados
                             </a>
                         </li>
-                        <!-- Aquí se agregarán más opciones del menú -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('votes.index') }}">
+                                <i class="bi bi-list-check"></i> Listado de Votos
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
