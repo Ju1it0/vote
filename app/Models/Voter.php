@@ -15,6 +15,9 @@ class Voter extends Model
         'lastname',
         'dob',
         'isCandidate',
+        'address',
+        'phone',
+        'gender',
     ];
 
     protected $casts = [

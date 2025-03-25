@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VoteListController;
+use App\Http\Controllers\Admin\VoterController;
 use App\Http\Controllers\VoteController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,4 +39,15 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Rutas para cambio de contraseña del administrador
     Route::get('/password', [App\Http\Controllers\Admin\PasswordController::class, 'showChangeForm'])->name('admin.password');
     Route::post('/password', [App\Http\Controllers\Admin\PasswordController::class, 'update'])->name('admin.password.update');
+
+    // Rutas para el CRUD de votantes
+    Route::resource('voters', VoterController::class)->names([
+        'index' => 'admin.voters.index',
+        'create' => 'admin.voters.create',
+        'store' => 'admin.voters.store',
+        'show' => 'admin.voters.show',
+        'edit' => 'admin.voters.edit',
+        'update' => 'admin.voters.update',
+        'destroy' => 'admin.voters.destroy',
+    ]);
 });

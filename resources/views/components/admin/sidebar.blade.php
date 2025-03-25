@@ -14,6 +14,11 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.voters.*') ? 'active' : '' }}" href="{{ route('admin.voters.index') }}">
+                    <i class="bi bi-people"></i> Gestionar Votantes
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.password') ? 'active' : '' }}" href="{{ route('admin.password') }}">
                     <i class="bi bi-key"></i> Cambiar Contraseña
                 </a>
