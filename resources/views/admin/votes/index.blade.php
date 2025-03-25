@@ -60,7 +60,7 @@
             </table>
         </div>
 
-        <div class="mt-3">
+        <div class="mt-4 d-flex justify-content-center">
             {{ $votes->links() }}
         </div>
     </div>

@@ -22,7 +22,7 @@ class VoteListController extends Controller
         // Obtener el listado de votos con información básica
         $votes = Vote::with(['voter:id,name,lastname', 'candidate:id,name,lastname'])
             ->orderByDesc('date')
-            ->paginate(10);
+            ->paginate(20);
 
         return view('admin.votes.index', compact('topCandidate', 'votes'));
     }

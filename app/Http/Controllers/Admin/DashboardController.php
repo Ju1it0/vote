@@ -16,8 +16,8 @@ class DashboardController extends Controller
             ->where('voters.isCandidate', true)
             ->groupBy('voters.id', 'voters.document', 'voters.name', 'voters.lastname', 'voters.dob', 'voters.isCandidate', 'voters.created_at', 'voters.updated_at')
             ->orderByDesc('vote_count')
-            ->paginate(10);
+            ->paginate(20);
 
         return view('admin.dashboard.index', compact('topCandidates'));
     }
-} 
+}
