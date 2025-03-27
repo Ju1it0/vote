@@ -1,6 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\VoteController;
+use App\Http\Controllers\Api\VoterController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +17,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Rutas públicas
+Route::post('/login', [AuthController::class, 'login']);
+
+// Rutas protegidas
+Route::middleware('auth:sanctum')->group(function () {
+    // Autenticación
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [AuthController::class, 'user']);
+    Route::put('/password', [AuthController::class, 'updatePassword']);
+
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    // Votantes
+    Route::apiResource('voters', VoterController::class);
+
+    // Votos
+    Route::apiResource('votes', VoteController::class)->only(['index', 'store', 'show']);
 });

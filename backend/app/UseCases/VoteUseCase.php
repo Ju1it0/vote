@@ -33,7 +33,7 @@ class VoteUseCase
             $candidate = Voter::where('id', $candidateId)
                 ->where('isCandidate', true)
                 ->first();
-            
+
             if (!$candidate) {
                 return [
                     'success' => false,
@@ -60,4 +60,4 @@ class VoteUseCase
             ];
         }
     }
-} 
+}

@@ -24,4 +24,14 @@ class Voter extends Model
         'dob' => 'date',
         'isCandidate' => 'boolean',
     ];
+
+    public function vote()
+    {
+        return $this->hasOne(Vote::class);
+    }
+
+    public function hasVoted()
+    {
+        return $this->vote()->exists();
+    }
 }
