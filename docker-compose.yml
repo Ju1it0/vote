@@ -7,6 +7,11 @@ services:
     container_name: vote-app
     restart: unless-stopped
     working_dir: /var/www
+    environment:
+      - DB_HOST=db
+      - DB_DATABASE=vote
+      - DB_USERNAME=vote
+      - DB_PASSWORD=vote
     volumes:
       - ./backend:/var/www
     networks:
@@ -29,10 +34,10 @@ services:
     container_name: vote-db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME}
+      - MYSQL_DATABASE=vote
+      - MYSQL_ROOT_PASSWORD=vote
+      - MYSQL_PASSWORD=vote
+      - MYSQL_USER=vote
     volumes:
       - dbdata:/var/lib/mysql
     ports:
