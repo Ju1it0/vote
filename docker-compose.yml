@@ -1,10 +1,10 @@
 version: '3'
 services:
-  app:
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: vote-app
+    container_name: vote-backend
     restart: unless-stopped
     working_dir: /var/www
     environment:
@@ -14,18 +14,21 @@ services:
       - DB_PASSWORD=vote
     volumes:
       - ./backend:/var/www
+    ports:
+      - "8000:8000"
     networks:
       - vote-network
 
-  nginx:
-    image: nginx:alpine
-    container_name: vote-nginx
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vote-frontend
     restart: unless-stopped
     ports:
-      - "8000:80"
-    volumes:
-      - ./backend:/var/www
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - "3000:80"
+    depends_on:
+      - backend
     networks:
       - vote-network
 

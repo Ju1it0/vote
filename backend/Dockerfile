@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    gnupg
+    gnupg \
+    nginx
 
 # Limpiar caché
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -33,7 +34,7 @@ RUN composer install
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 # Exponer puerto
-EXPOSE 9000
+EXPOSE 8000
 
-# Comando para iniciar PHP-FPM
-CMD ["php-fpm"] 
+# Comando para iniciar Laravel
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"] 
