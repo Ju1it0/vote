@@ -43,6 +43,27 @@ docker-compose exec backend php artisan key:generate
 docker-compose exec backend php artisan migrate:fresh --seed
 ```
 
+## Poblar la Base de Datos
+
+Hay dos formas de poblar la base de datos con datos iniciales:
+
+1. Durante la instalación (como se menciona en el paso 6):
+```bash
+docker-compose exec backend php artisan migrate:fresh --seed
+```
+
+2. Si ya tienes la base de datos con migraciones y solo quieres agregar los datos de prueba:
+```bash
+docker-compose exec backend php artisan db:seed
+```
+
+Los seeders crearán:
+- Un usuario administrador (admin@admin.com / password)
+- 47 votantes regulares
+- 3 candidatos
+
+**Nota**: `migrate:fresh` borrará todos los datos existentes. Usa `db:seed` si solo quieres agregar datos sin borrar los existentes.
+
 ## Acceso a la Aplicación
 
 La aplicación estará disponible en:

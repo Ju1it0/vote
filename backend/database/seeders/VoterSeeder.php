@@ -13,7 +13,7 @@ class VoterSeeder extends Seeder
     public function run(): void
     {
         // Crear 8 votantes regulares
-        for ($i = 1; $i <= 8; $i++) {
+        for ($i = 1; $i <= 47; $i++) {
             Voter::create([
                 'document' => 'VOT' . str_pad($i, 4, '0', STR_PAD_LEFT),
                 'name' => 'Votante',
@@ -24,7 +24,7 @@ class VoterSeeder extends Seeder
         }
 
         // Crear 2 candidatos
-        for ($i = 1; $i <= 2; $i++) {
+        for ($i = 1; $i <= 3; $i++) {
             Voter::create([
                 'document' => 'CAN' . str_pad($i, 4, '0', STR_PAD_LEFT),
                 'name' => 'Candidato',
