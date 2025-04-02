@@ -14,6 +14,7 @@
 /backend/auth.json
 /backend/npm-debug.log
 /backend/yarn-error.log
+/.cookies.txt
 /.fleet
 /.idea
 /.vscode 
