@@ -1,0 +1,57 @@
+version: '3'
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vote-backend
+    restart: unless-stopped
+    working_dir: /var/www
+    environment:
+      - DB_HOST=db
+      - DB_DATABASE=vote
+      - DB_USERNAME=vote
+      - DB_PASSWORD=vote
+    volumes:
+      - ./backend:/var/www
+    ports:
+      - "8000:8000"
+    networks:
+      - vote-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vote-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - vote-network
+
+  db:
+    image: mysql:8.0
+    container_name: vote-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=vote
+      - MYSQL_ROOT_PASSWORD=vote
+      - MYSQL_PASSWORD=vote
+      - MYSQL_USER=vote
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - vote-network
+
+networks:
+  vote-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local 
