@@ -3,7 +3,7 @@ import { voterService } from '../services/api';
 import { Voter } from '../types';
 
 interface CandidateWithVotes extends Voter {
-  totalVotes: number;
+  received_votes_count: number;
 }
 
 const TopCandidatesPage: React.FC = () => {
@@ -71,7 +71,7 @@ const TopCandidatesPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="col-span-1 text-sm text-gray-900 font-medium">
-                      {candidate.totalVotes}
+                      {candidate.received_votes_count}
                     </div>
                   </div>
                 </div>

@@ -3,86 +3,91 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Voter;
+use App\UseCases\Voter\GetAllVotersUseCase;
+use App\UseCases\Voter\GetVoterByIdUseCase;
+use App\UseCases\Voter\CreateVoterUseCase;
+use App\UseCases\Voter\UpdateVoterUseCase;
+use App\UseCases\Voter\DeleteVoterUseCase;
+use App\UseCases\Voter\GetCandidatesUseCase;
+use App\UseCases\Voter\GetTopCandidatesUseCase;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class VoterController extends Controller
 {
-    public function index()
+    public function __construct(
+        private GetAllVotersUseCase $getAllVotersUseCase,
+        private GetVoterByIdUseCase $getVoterByIdUseCase,
+        private CreateVoterUseCase $createVoterUseCase,
+        private UpdateVoterUseCase $updateVoterUseCase,
+        private DeleteVoterUseCase $deleteVoterUseCase,
+        private GetCandidatesUseCase $getCandidatesUseCase,
+        private GetTopCandidatesUseCase $getTopCandidatesUseCase
+    ) {}
+
+    public function index(Request $request): JsonResponse
     {
-        $voters = Voter::orderBy('created_at', 'desc')->paginate(20);
+        $page = $request->query('page', 1);
+        $voters = $this->getAllVotersUseCase->execute($page);
+
         return response()->json($voters);
     }
 
-    public function store(Request $request)
+    public function show(int $id): JsonResponse
     {
-        $request->validate([
-            'document' => 'required|string|max:20|unique:voters',
+        $voter = $this->getVoterByIdUseCase->execute($id);
+        return response()->json($voter);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
+            'document' => 'required|string|max:20',
             'dob' => 'required|date',
-            'isCandidate' => 'boolean',
-            'address' => 'required|string|max:255',
+            'gender' => 'required|in:M,F,O',
             'phone' => 'required|string|max:20',
-            'gender' => 'required|string|in:M,F,O',
+            'address' => 'required|string|max:255',
+            'isCandidate' => 'boolean',
         ]);
 
-        $voter = Voter::create($request->all());
-
+        $voter = $this->createVoterUseCase->execute($data);
         return response()->json($voter, 201);
     }
 
-    public function show(Voter $voter)
+    public function update(Request $request, int $id): JsonResponse
     {
-        return response()->json($voter);
-    }
-
-    public function update(Request $request, Voter $voter)
-    {
-        $request->validate([
-            'document' => 'required|string|max:20|unique:voters,document,' . $voter->id,
-            'name' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
-            'dob' => 'required|date',
-            'isCandidate' => 'boolean',
-            'address' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'gender' => 'required|string|in:M,F,O',
+        $data = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'lastname' => 'sometimes|string|max:255',
+            'document' => 'sometimes|string|max:20',
+            'dob' => 'sometimes|date',
+            'gender' => 'sometimes|in:M,F,O',
+            'phone' => 'sometimes|string|max:20',
+            'address' => 'sometimes|string|max:255',
+            'isCandidate' => 'sometimes|boolean',
         ]);
 
-        $voter->update($request->all());
-
+        $voter = $this->updateVoterUseCase->execute($id, $data);
         return response()->json($voter);
     }
 
-    public function destroy(Voter $voter)
+    public function destroy(int $id): JsonResponse
     {
-        $voter->delete();
-
+        $this->deleteVoterUseCase->execute($id);
         return response()->json(null, 204);
     }
 
-    public function candidates()
+    public function candidates(): JsonResponse
     {
-        return Voter::where('isCandidate', true)->get();
+        $candidates = $this->getCandidatesUseCase->execute();
+        return response()->json($candidates);
     }
 
-    public function topCandidates()
+    public function topCandidates(): JsonResponse
     {
-        $candidates = Voter::where('isCandidate', true)
-            ->withCount('receivedVotes')
-            ->orderBy('received_votes_count', 'desc')
-            ->get()
-            ->map(function ($candidate) {
-                return [
-                    'id' => $candidate->id,
-                    'name' => $candidate->name,
-                    'lastname' => $candidate->lastname,
-                    'document' => $candidate->document,
-                    'totalVotes' => $candidate->received_votes_count
-                ];
-            });
-
+        $candidates = $this->getTopCandidatesUseCase->execute();
         return response()->json(['data' => $candidates]);
     }
 }

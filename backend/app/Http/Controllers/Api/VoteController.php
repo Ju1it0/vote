@@ -3,78 +3,42 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vote;
-use App\Models\Voter;
-use App\UseCases\VoteUseCase;
+use App\UseCases\Vote\GetAllVotesUseCase;
+use App\UseCases\Vote\GetMostVotedCandidateUseCase;
+use App\UseCases\Vote\CreateVoteUseCase;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 
 class VoteController extends Controller
 {
-    protected $voteUseCase;
+    public function __construct(
+        private GetAllVotesUseCase $getAllVotesUseCase,
+        private GetMostVotedCandidateUseCase $getMostVotedCandidateUseCase,
+        private CreateVoteUseCase $createVoteUseCase
+    ) {}
 
-    public function __construct(VoteUseCase $voteUseCase)
+    public function index(Request $request): JsonResponse
     {
-        $this->voteUseCase = $voteUseCase;
-    }
-
-    public function index(Request $request)
-    {
-        $votes = Vote::with(['voter', 'candidate'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $page = $request->query('page', 1);
+        $votes = $this->getAllVotesUseCase->execute($page);
 
         return response()->json($votes);
     }
 
-    public function getMostVotedCandidate()
+    public function store(Request $request): JsonResponse
     {
-        $mostVoted = DB::table('votes')
-            ->select('candidateId', DB::raw('COUNT(*) as total_votes'))
-            ->whereNotNull('candidateId')
-            ->groupBy('candidateId')
-            ->orderByDesc('total_votes')
-            ->first();
-
-        if (!$mostVoted) {
-            return response()->json([
-                'candidate' => null,
-                'totalVotes' => 0
-            ]);
-        }
-
-        $candidate = Voter::find($mostVoted->candidateId);
-
-        return response()->json([
-            'candidate' => $candidate,
-            'totalVotes' => $mostVoted->total_votes
-        ]);
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'document' => 'required|string|max:20',
-            'candidateId' => 'required|exists:voters,id',
+        $data = $request->validate([
+            'document' => 'required|string',
+            'candidateId' => 'required|integer',
         ]);
 
-        $result = $this->voteUseCase->execute($request->document, $request->candidateId);
-
-        if (!$result['success']) {
-            throw ValidationException::withMessages([
-                'document' => [$result['message']],
-            ]);
-        }
-
-        return response()->json([
-            'message' => $result['message']
-        ], 201);
+        $result = $this->createVoteUseCase->execute($data);
+        return response()->json($result, 201);
     }
 
-    public function show(Vote $vote)
+    public function getMostVotedCandidate(): JsonResponse
     {
-        $vote->load(['voter', 'candidate']);
-        return response()->json($vote);
+        $result = $this->getMostVotedCandidateUseCase->execute();
+        return response()->json($result);
     }
 }

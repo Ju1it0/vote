@@ -23,22 +23,32 @@ cd vote
 cp backend/.env.example backend/.env
 ```
 
-3. Inicia los contenedores Docker:
+3. Asegúrate de que el archivo `.env` del backend tenga la configuración correcta de la base de datos:
+```env
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=vote
+DB_USERNAME=vote
+DB_PASSWORD=vote
+```
+
+4. Inicia los contenedores Docker:
 ```bash
 docker-compose up -d
 ```
 
-4. Instala las dependencias del backend:
+5. Instala las dependencias del backend:
 ```bash
 docker-compose exec backend composer install
 ```
 
-5. Genera la clave de la aplicación:
+6. Genera la clave de la aplicación:
 ```bash
 docker-compose exec backend php artisan key:generate
 ```
 
-6. Ejecuta las migraciones y seeders:
+7. Ejecuta las migraciones y seeders:
 ```bash
 docker-compose exec backend php artisan migrate:fresh --seed
 ```
@@ -47,7 +57,7 @@ docker-compose exec backend php artisan migrate:fresh --seed
 
 Hay dos formas de poblar la base de datos con datos iniciales:
 
-1. Durante la instalación (como se menciona en el paso 6):
+1. Durante la instalación (como se menciona en el paso 7):
 ```bash
 docker-compose exec backend php artisan migrate:fresh --seed
 ```
@@ -103,6 +113,38 @@ docker-compose down
 - Ver logs:
 ```bash
 docker-compose logs -f
+```
+
+- Ver logs de un servicio específico:
+```bash
+docker-compose logs -f [backend|frontend|db]
+```
+
+## Problemas Comunes y Soluciones
+
+### Error de Conexión a la Base de Datos
+Si encuentras un error de conexión a la base de datos (SQLSTATE[HY000] [2002] Connection refused), verifica que:
+1. El archivo `.env` del backend tenga la configuración correcta de la base de datos
+2. Los contenedores estén corriendo (`docker-compose ps`)
+3. La base de datos esté accesible (`docker-compose exec db mysql -u vote -pvote -e "SHOW DATABASES;"`)
+
+### Frontend no Accesible
+Si no puedes acceder al frontend en http://localhost:3000:
+1. Verifica que el contenedor del frontend esté corriendo
+2. Revisa los logs del frontend: `docker-compose logs frontend`
+3. Asegúrate de que no haya conflictos de puertos en tu máquina local
+
+### Reinicio Completo
+Si encuentras problemas persistentes, puedes intentar un reinicio completo:
+```bash
+# Detener y eliminar todos los contenedores y volúmenes
+docker-compose down -v
+
+# Reconstruir y reiniciar los contenedores
+docker-compose up -d --build
+
+# Ejecutar las migraciones y seeders
+docker-compose exec backend php artisan migrate:fresh --seed
 ```
 
 ## Documentación Adicional

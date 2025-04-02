@@ -3,42 +3,37 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\UseCases\Auth\LoginUseCase;
+use App\UseCases\Auth\LogoutUseCase;
+use App\UseCases\Auth\ChangePasswordUseCase;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function __construct(
+        private LoginUseCase $loginUseCase,
+        private LogoutUseCase $logoutUseCase,
+        private ChangePasswordUseCase $changePasswordUseCase
+    ) {}
+
+    public function login(Request $request): JsonResponse
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales proporcionadas son incorrectas.'],
-            ]);
-        }
+        $result = $this->loginUseCase->execute($credentials);
 
-        $user = Auth::user();
-        $token = $user->createToken('auth-token')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ]);
+        return response()->json($result);
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $this->logoutUseCase->execute($request->user());
 
-        return response()->json([
-            'message' => 'Sesión cerrada exitosamente',
-        ]);
+        return response()->json(['message' => 'Sesión cerrada exitosamente']);
     }
 
     public function user(Request $request)
@@ -46,27 +41,4 @@ class AuthController extends Controller
         return response()->json($request->user());
     }
 
-    public function updatePassword(Request $request)
-    {
-        $request->validate([
-            'current_password' => 'required',
-            'password' => 'required|min:8|confirmed',
-        ]);
-
-        $user = $request->user();
-
-        if (!Hash::check($request->current_password, $user->password)) {
-            throw ValidationException::withMessages([
-                'current_password' => ['La contraseña actual es incorrecta.'],
-            ]);
-        }
-
-        $user->update([
-            'password' => Hash::make($request->password),
-        ]);
-
-        return response()->json([
-            'message' => 'Contraseña actualizada exitosamente',
-        ]);
-    }
 }

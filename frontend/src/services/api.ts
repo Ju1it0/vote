@@ -59,8 +59,8 @@ export const voterService = {
     const response = await protectedApi.get<PaginatedResponse<Voter>>(`/voters?page=${page}`);
     return response.data;
   },
-  getTopCandidates: async (): Promise<{ data: (Voter & { totalVotes: number })[] }> => {
-    const response = await publicApi.get<{ data: (Voter & { totalVotes: number })[] }>('/candidates/top');
+  getTopCandidates: async (): Promise<{ data: (Voter & { received_votes_count: number })[] }> => {
+    const response = await publicApi.get<{ data: (Voter & { received_votes_count: number })[] }>('/candidates/top');
     return response.data;
   },
   getById: async (id: number): Promise<Voter> => {
