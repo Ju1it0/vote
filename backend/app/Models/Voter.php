@@ -34,4 +34,9 @@ class Voter extends Model
     {
         return $this->vote()->exists();
     }
+
+    public function receivedVotes()
+    {
+        return $this->hasMany(Vote::class, 'candidateId');
+    }
 }

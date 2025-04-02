@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vote;
+use App\Models\Voter;
 use App\UseCases\VoteUseCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class VoteController extends Controller
@@ -17,11 +19,37 @@ class VoteController extends Controller
         $this->voteUseCase = $voteUseCase;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $votes = Vote::with(['voter:id,name,lastname,document', 'candidate:id,name,lastname'])->get();
+        $votes = Vote::with(['voter', 'candidate'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
 
         return response()->json($votes);
+    }
+
+    public function getMostVotedCandidate()
+    {
+        $mostVoted = DB::table('votes')
+            ->select('candidateId', DB::raw('COUNT(*) as total_votes'))
+            ->whereNotNull('candidateId')
+            ->groupBy('candidateId')
+            ->orderByDesc('total_votes')
+            ->first();
+
+        if (!$mostVoted) {
+            return response()->json([
+                'candidate' => null,
+                'totalVotes' => 0
+            ]);
+        }
+
+        $candidate = Voter::find($mostVoted->candidateId);
+
+        return response()->json([
+            'candidate' => $candidate,
+            'totalVotes' => $mostVoted->total_votes
+        ]);
     }
 
     public function store(Request $request)
@@ -46,6 +74,7 @@ class VoteController extends Controller
 
     public function show(Vote $vote)
     {
-        return response()->json($vote->load(['voter:id,name,lastname,document', 'candidate:id,name,lastname']));
+        $vote->load(['voter', 'candidate']);
+        return response()->json($vote);
     }
 }

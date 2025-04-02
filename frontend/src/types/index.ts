@@ -24,32 +24,12 @@ export interface Voter {
 
 export interface Vote {
   id: number;
-  voterId: number;
-  candidateId: number;
-  date: string;
+  voter_id: number;
+  candidate_id: number;
   created_at: string;
   updated_at: string;
-  voter: {
-    id: number;
-    name: string;
-    lastname: string;
-    document: string;
-  };
-  candidate: {
-    id: number;
-    name: string;
-    lastname: string;
-  };
-}
-
-export interface DashboardStats {
-  total_voters: number;
-  total_votes: number;
-  total_candidates: number;
-  votes_by_candidate: Array<{
-    candidate: string;
-    total: number;
-  }>;
+  voter: Voter;
+  candidate: Voter;
 }
 
 export interface LoginCredentials {
@@ -60,4 +40,12 @@ export interface LoginCredentials {
 export interface AuthResponse {
   user: User;
   token: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
 } 

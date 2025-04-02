@@ -18,9 +18,9 @@ git clone https://github.com/Ju1it0/vote.git
 cd vote
 ```
 
-2. Copia el archivo de variables de entorno:
+2. Copia el archivo de variables de entorno del backend:
 ```bash
-cp .env.example .env
+cp backend/.env.example backend/.env
 ```
 
 3. Inicia los contenedores Docker:
@@ -28,31 +28,26 @@ cp .env.example .env
 docker-compose up -d
 ```
 
-4. Instala las dependencias de PHP:
+4. Instala las dependencias del backend:
 ```bash
-docker-compose exec app composer install
+docker-compose exec backend composer install
 ```
 
 5. Genera la clave de la aplicación:
 ```bash
-docker-compose exec app php artisan key:generate
+docker-compose exec backend php artisan key:generate
 ```
 
 6. Ejecuta las migraciones y seeders:
 ```bash
-docker-compose exec app php artisan migrate:fresh --seed
-```
-
-7. Instala las dependencias de Node.js y compila los assets:
-```bash
-docker-compose exec app npm install
-docker-compose exec app npm run build
+docker-compose exec backend php artisan migrate:fresh --seed
 ```
 
 ## Acceso a la Aplicación
 
 La aplicación estará disponible en:
-- Frontend: http://localhost:8000
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
 - Base de datos MySQL: localhost:3306
 
 ## Credenciales por Defecto
@@ -65,8 +60,8 @@ La aplicación estará disponible en:
 
 El proyecto utiliza las siguientes tecnologías:
 
-- **Backend**: Laravel 10
-- **Frontend**: React con Vite
+- **Backend**: Laravel 10 (/backend)
+- **Frontend**: React + Vite (/frontend)
 - **Base de datos**: MySQL 8.0
 - **Servidor web**: Nginx
 - **PHP**: 8.2
@@ -87,16 +82,6 @@ docker-compose down
 - Ver logs:
 ```bash
 docker-compose logs -f
-```
-
-- Acceder a la consola de Laravel:
-```bash
-docker-compose exec app php artisan tinker
-```
-
-- Ejecutar pruebas:
-```bash
-docker-compose exec app php artisan test
 ```
 
 ## Documentación Adicional

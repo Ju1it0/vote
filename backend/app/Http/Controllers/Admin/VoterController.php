@@ -13,7 +13,7 @@ class VoterController extends Controller
      */
     public function index()
     {
-        $voters = Voter::orderBy('created_at', 'desc')->paginate(10);
+        $voters = Voter::orderBy('created_at', 'desc')->paginate(20);
         return view('admin.voters.index', compact('voters'));
     }
 

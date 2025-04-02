@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -13,6 +13,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,8 +27,10 @@ export function LoginPage() {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
+      const from = (location.state as any)?.from?.pathname || '/admin/top-candidates';
+      navigate(from, { replace: true });
     } catch (err) {
+      console.error('Credenciales inválidas', err);
       setError('Credenciales inválidas');
     } finally {
       setLoading(false);
@@ -95,6 +98,14 @@ export function LoginPage() {
               disabled={loading}
             >
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={() => navigate('/vote')}
+              sx={{ mb: 2 }}
+            >
+              Volver a Votar
             </Button>
           </Box>
         </Paper>

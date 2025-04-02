@@ -1,90 +1,106 @@
 import axios from 'axios';
-import { AuthResponse, LoginCredentials, Voter, Vote, DashboardStats } from '../types';
+import { AuthResponse, LoginCredentials, Voter, Vote, PaginatedResponse } from '../types';
+import { API_URL } from '../utils/constants';
 
-const api = axios.create({
-  baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json',
+export const publicApi = axios.create({
+  baseURL: API_URL,
+});
+
+export const protectedApi = axios.create({
+  baseURL: API_URL,
+});
+
+protectedApi.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
   },
-});
-
-// Interceptor para agregar el token a las peticiones
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
-// Servicios de autenticación
+interface ChangePasswordData {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}
+
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/login', credentials);
-    localStorage.setItem('token', response.data.token);
+    const response = await publicApi.post<AuthResponse>('/api/login', credentials);
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
     return response.data;
   },
 
   logout: async (): Promise<void> => {
-    await api.post('/logout');
+    await protectedApi.post('/api/logout');
     localStorage.removeItem('token');
   },
 
   getUser: async () => {
-    const response = await api.get('/user');
+    const response = await protectedApi.get('/api/user');
+    return response.data;
+  },
+
+  changePassword: async (data: ChangePasswordData): Promise<void> => {
+    const response = await protectedApi.put('/api/password', data);
     return response.data;
   },
 };
 
-// Servicios de votantes
 export const voterService = {
-  getAll: async (): Promise<Voter[]> => {
-    const response = await api.get<Voter[]>('/voters');
+  getAll: async (page: number = 1): Promise<PaginatedResponse<Voter>> => {
+    const response = await protectedApi.get<PaginatedResponse<Voter>>(`/api/voters?page=${page}`);
     return response.data;
   },
-
+  getTopCandidates: async (): Promise<{ data: (Voter & { totalVotes: number })[] }> => {
+    const response = await publicApi.get<{ data: (Voter & { totalVotes: number })[] }>('/api/candidates/top');
+    return response.data;
+  },
   getById: async (id: number): Promise<Voter> => {
-    const response = await api.get<Voter>(`/voters/${id}`);
+    const response = await protectedApi.get<Voter>(`/api/voters/${id}`);
     return response.data;
   },
-
   create: async (voter: Omit<Voter, 'id' | 'created_at' | 'updated_at'>): Promise<Voter> => {
-    const response = await api.post<Voter>('/voters', voter);
+    const response = await protectedApi.post<Voter>('/api/voters', voter);
     return response.data;
   },
-
   update: async (id: number, voter: Partial<Voter>): Promise<Voter> => {
-    const response = await api.put<Voter>(`/voters/${id}`, voter);
+    const response = await protectedApi.put<Voter>(`/api/voters/${id}`, voter);
     return response.data;
   },
-
   delete: async (id: number): Promise<void> => {
-    await api.delete(`/voters/${id}`);
+    await protectedApi.delete(`/api/voters/${id}`);
   },
 };
-
-// Servicios de votos
 export const voteService = {
-  getAll: async (): Promise<Vote[]> => {
-    const response = await api.get<Vote[]>('/votes');
+  getAll: async (page: number = 1): Promise<PaginatedResponse<Vote>> => {
+    const response = await protectedApi.get<PaginatedResponse<Vote>>(`/api/votes?page=${page}`);
     return response.data;
   },
-
-  getById: async (id: number): Promise<Vote> => {
-    const response = await api.get<Vote>(`/votes/${id}`);
+  getMostVotedCandidate: async (): Promise<{ candidate: Voter; totalVotes: number }> => {
+    const response = await protectedApi.get<{ candidate: Voter; totalVotes: number }>('/api/votes/most-voted');
     return response.data;
   },
-
   create: async (vote: { document: string; candidateId: number }): Promise<{ message: string }> => {
-    const response = await api.post<{ message: string }>('/votes', vote);
+    const response = await publicApi.post<{ message: string }>('/api/votes', vote);
+    return response.data;
+  },
+  getCandidates: async (): Promise<Voter[]> => {
+    const response = await publicApi.get<Voter[]>('/api/candidates');
+    return response.data;
+  },
+  submitVote: async (document: string, candidateId: number): Promise<{ message: string }> => {
+    const response = await publicApi.post<{ message: string }>('/api/votes', {
+      document,
+      candidateId,
+    });
     return response.data;
   },
 };
-
-// Servicios del dashboard
-export const dashboardService = {
-  getStats: async (): Promise<DashboardStats> => {
-    const response = await api.get<DashboardStats>('/dashboard');
-    return response.data;
-  },
-}; 
